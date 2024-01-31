@@ -1,0 +1,31 @@
+platform: linux
+
+image_resource:
+  type: registry-image
+  source:
+    repository: debian
+    tag: bookworm
+
+inputs:
+- name: snapshot
+
+outputs:
+- name: destination
+
+run:
+  path: sh
+  args:
+  - -exc
+  - |
+    export LANG=C
+    export LC_ALL=C
+    export DEBIAN_FRONTEND=noninteractive
+
+    apt update --assume-yes
+    apt install --assume-yes python3
+
+    mkdir -- ./build
+    (cd -- ./build && python3 ../snapshot/.ci/bookworm.py)
+
+    tar --create --owner=`id --user` --group=`id --group` --directory=build -- image packages \
+    | tar --extract --directory=destination

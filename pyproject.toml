@@ -1,0 +1,28 @@
+[project]
+name = "p5.lcboot"
+readme = "README.md"
+version = "0.0.0"
+license = {file = "LICENSE"}
+authors = [{name = "p5-vbnekit", email = "vbnekit@gmail.com"}]
+description = "p5.lcboot python3 package"
+maintainers = [{name = "p5-vbnekit", email = "vbnekit@gmail.com"}]
+dependencies = ["PyYAML"]
+
+[project.urls]
+homepage = "https://github.com/p5-vbnekit/lcboot"
+
+[project.scripts]
+"p5.lcboot.init" = "p5.lcboot.scripts.init:run"
+"p5.lcboot.overlay" = "p5.lcboot.scripts.overlay:run"
+"p5.lcboot.initctl" = "p5.lcboot.scripts.initctl:run"
+"p5.lcboot.tolerant" = "p5.lcboot.scripts.tolerant:run"
+
+[project.optional-dependencies]
+dev = ["pyproject-flake8"]
+
+[tool.flake8]
+extend-ignore = ["E251", "E701"]
+max-line-length = 128
+
+[tool.setuptools]
+package-dir = {"p5.lcboot" = "python3"}

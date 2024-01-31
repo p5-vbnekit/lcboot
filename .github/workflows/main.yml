@@ -1,0 +1,17 @@
+on: push
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with: { path: snapshot }
+
+    - uses: ./snapshot/.github/actions/build
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: build
+        path: |
+          build/image
+          build/packages

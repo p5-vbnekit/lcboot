@@ -1,0 +1,38 @@
+inputs:
+  build: { default: "build" }
+  snapshot: { default: "snapshot" }
+
+runs:
+  using: composite
+  steps:
+    - shell: sh -e -- {0}
+      run: docker build --pull --tag=build -- "${{ github.action_path }}"
+
+    - shell: python3 -- {0}
+      run: |
+        # docker run
+        import os
+        import sys
+        import shutil
+        import pathlib
+        _stdin = sys.stdin
+        if _stdin is not None:
+          _stdin = [_stdin.fileno(), _stdin]
+          _stdin.pop().close()
+          os.close(_stdin.pop())
+        del _stdin
+        _build_directory = pathlib.Path("${{ inputs.build }}").resolve(strict = False)
+        _snapshot_directory = pathlib.Path("${{ inputs.snapshot }}").resolve(strict = True)
+        _build_directory.mkdir(parents = True, exist_ok = True)
+        _build_directory = _build_directory.resolve(strict = True)
+        assert _build_directory.is_dir()
+        assert _snapshot_directory.is_dir()
+        _docker = shutil.which("docker")
+        assert _docker
+        os.execv(_docker, (
+          "docker", "run", "--rm", "--privileged",
+          f"--volume={_build_directory.as_posix()}:/mnt/build",
+          f"--volume={_snapshot_directory.as_posix()}:/mnt/snapshot",
+          "--", "build", "/mnt/build", "/mnt/snapshot"
+        ))
+        raise RuntimeError("exec call returned")
